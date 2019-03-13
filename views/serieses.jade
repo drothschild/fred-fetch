@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+
+  if serieses.length > 0
+    ul
+      each series in serieses
+        li
+          a(href=`/${series.id}`)
+            =series.title
+    a(href="/unemployment?begin_year=1980&end_year=2015") Unemployment Rates Per Year
+  else
+    p No data loaded, would you like to
+    a(href='/import') import data?

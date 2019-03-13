@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= series.title
+  p= series.units
+  p= series.notes
+
+  ul
+    each observation in series.observations
+      li
+        =`${observation.observation_date.toISOString().slice(0,10)}    ${observation.value}`
+
