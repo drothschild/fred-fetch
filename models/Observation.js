@@ -15,25 +15,20 @@ const getObservations = (options = {}) => {
 
 const importObservations = (options = {}) => {
   const { seriesID } = options
-  const cs = new pgp.helpers.ColumnSet(
-    ['observation_date', 'value', 'series_id'],
+  const cs = new pgp.helpers.ColumnSet([
+    {name: 'observation_date', prop: 'date'},
+    'value',
+    {name: 'series_id', init: ()=> seriesID}
+    ],
     {
       table: 'observations'
     }
-  )
+  );
   return outsideAPI.loadObservations({ seriesID }).then(observations => {
-    const values = observations.map(observation => {
-      return {
-        observation_date: observation.date,
-        value: observation.value,
-        series_id: seriesID
-      }
-    })
-    const query = pgp.helpers.insert(values, cs)
-    return db.task(t =>
-      t
-        .none('DELETE FROM observations WHERE series_id = $1', seriesID)
-        .then(() => t.none(query))
+    const query = ()=> pgp.helpers.insert(observations, cs);
+    return db.task(function*(t) =>
+      yield t.none('DELETE FROM observations WHERE series_id = $1', seriesID);
+      yield t.none(query);
     )
   })
 }
