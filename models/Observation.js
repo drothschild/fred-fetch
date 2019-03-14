@@ -26,10 +26,10 @@ const importObservations = (options = {}) => {
   );
   return outsideAPI.loadObservations({ seriesID }).then(observations => {
     const query = ()=> pgp.helpers.insert(observations, cs);
-    return db.task(function*(t) =>
+    return db.task(function*(t) {
       yield t.none('DELETE FROM observations WHERE series_id = $1', seriesID);
       yield t.none(query);
-    )
+    });
   })
 }
 
